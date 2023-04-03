@@ -1,0 +1,19 @@
+FROM alpine:latest
+
+
+# Install deps
+RUN apk update && apk upgrade
+RUN apk add --no-cache git build-base linux-headers libbsd-dev py3-pip patchelf fuse-dev
+RUN git clone https://github.com/ruanformigoni/e2fsprogs.git
+
+WORKDIR e2fsprogs
+
+# Compile
+RUN git checkout fuse2fs-offset
+RUN mkdir -p dist
+RUN mkdir build && cd build && ../configure && make
+
+# Create static binary
+RUN pip3 install wheel scons
+RUN pip3 install staticx
+RUN staticx build/misc/fuse2fs dist/fuse2fs
