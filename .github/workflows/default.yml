@@ -14,8 +14,10 @@ jobs:
     - name: Compile and extract the artifact from docker container
       run: |
         mkdir -p dist
-        docker build -t alpine:fuse2fs -f Dockerfile.alpine .
-        docker run --rm -v $(pwd):/workdir alpine:fuse2fs cp /e2fsprogs/dist/fuse2fs /workdir/dist/fuse2fs
+        docker build -t alpine:e2sfsprogs -f Dockerfile.alpine .
+        docker run --rm -v $(pwd):/workdir alpine:e2sfsprogs cp /e2fsprogs/dist/fuse2fs   /workdir/dist/fuse2fs
+        docker run --rm -v $(pwd):/workdir alpine:e2sfsprogs cp /e2fsprogs/dist/e2fsck    /workdir/dist/e2fsck
+        docker run --rm -v $(pwd):/workdir alpine:e2sfsprogs cp /e2fsprogs/dist/resize2fs /workdir/dist/resize2fs
 
     - name: Set permissions for dist directory
       run: |
@@ -25,7 +27,7 @@ jobs:
     - name: Upload artifact to release
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: fuse2fs
+        name: e2sfsprogs
         path: 'dist'
 
     - name: Compute Short SHA
@@ -45,7 +47,7 @@ jobs:
       steps:
         - uses: actions/download-artifact@v1
           with:
-            name: fuse2fs
+            name: e2sfsprogs
 
         - name: release
           uses: marvinpinto/action-automatic-releases@latest
@@ -56,4 +58,6 @@ jobs:
             draft: false
             files: |
               fuse2fs
+              e2fsck
+              resize2fs
             repo_token: ${{ secrets.GITHUB_TOKEN }}

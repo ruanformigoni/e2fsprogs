@@ -16,4 +16,6 @@ RUN mkdir build && cd build && ../configure && make
 # Create static binary
 RUN pip3 install wheel scons
 RUN pip3 install staticx
-RUN staticx build/misc/fuse2fs dist/fuse2fs
+RUN staticx build/misc/fuse2fs     dist/fuse2fs
+RUN staticx build/e2fsck/e2fsck    dist/e2fsck
+RUN staticx build/resize/resize2fs dist/resize2fs
