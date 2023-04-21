@@ -23,5 +23,6 @@ RUN ./configure --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
 # Create static binary
 RUN mkdir -p dist
 RUN cp misc/fuse2fs     dist/fuse2fs
+RUN cp misc/mke2fs      dist/mke2fs
 RUN cp e2fsck/e2fsck    dist/e2fsck
 RUN cp resize/resize2fs dist/resize2fs
