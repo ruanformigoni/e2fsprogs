@@ -16,6 +16,7 @@ jobs:
         mkdir -p dist
         docker build -t alpine:e2fsprogs -f Dockerfile.alpine .
         docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/fuse2fs   /workdir/dist/fuse2fs
+        docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/mke2fs    /workdir/dist/mke2fs
         docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/e2fsck    /workdir/dist/e2fsck
         docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/resize2fs /workdir/dist/resize2fs
 
