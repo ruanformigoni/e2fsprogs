@@ -3,19 +3,25 @@ FROM alpine:latest
 
 # Install deps
 RUN apk update && apk upgrade
-RUN apk add --no-cache git build-base linux-headers libbsd-dev py3-pip patchelf fuse-dev
-RUN git clone https://github.com/ruanformigoni/e2fsprogs.git
+RUN apk add --no-cache git build-base linux-headers libbsd-dev \
+  fuse fuse-dev wget autoconf automake
 
+# Fetch sources
+## RUN mkdir e2fsprogs
+## COPY . e2fsprogs
+## WORKDIR e2fsprogs
+RUN git clone https://github.com/ruanformigoni/e2fsprogs.git
 WORKDIR e2fsprogs
+RUN git checkout fuse2fs-offset
 
 # Compile
-RUN git checkout fuse2fs-offset
-RUN mkdir -p dist
-RUN mkdir build && cd build && ../configure && make
+RUN mkdir libfuse && wget -Olibfuse/libfuse.a https://github.com/ruanformigoni/libfuse/releases/download/c9db3e5/libfuse.a
+RUN chmod +x ./configure.ac
+RUN autoconf ./configure.ac > configure
+RUN ./configure --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
 
 # Create static binary
-RUN pip3 install wheel scons
-RUN pip3 install staticx
-RUN staticx build/misc/fuse2fs     dist/fuse2fs
-RUN staticx build/e2fsck/e2fsck    dist/e2fsck
-RUN staticx build/resize/resize2fs dist/resize2fs
+RUN mkdir -p dist
+RUN cp misc/fuse2fs     dist/fuse2fs
+RUN cp e2fsck/e2fsck    dist/e2fsck
+RUN cp resize/resize2fs dist/resize2fs

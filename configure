@@ -883,6 +883,7 @@ ASM_TYPES_HEADER
 PUBLIC_CONFIG_HEADER'
 ac_user_opts='
 enable_option_checking
+with_fuse_lib_path
 with_diet_libc
 with_cc
 with_ccopts
@@ -1625,6 +1626,8 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-fuse-lib-path=PATH
+                          Specify the path to the FUSE library
   --with-diet-libc        use diet libc
   --with-cc               no longer supported, use CC= instead
   --with-ccopts           no longer supported, use CFLAGS= instead
@@ -4638,6 +4641,29 @@ printf "%s\n" "Release date is ${E2FSPROGS_MONTH}, ${E2FSPROGS_YEAR}" >&6; }
 
 
 
+
+
+
+# Check whether --with-fuse-lib-path was given.
+if test ${with_fuse_lib_path+y}
+then :
+  withval=$with_fuse_lib_path;
+fi
+
+# Set the library path if provided
+if test -n "$with_fuse_lib_path"
+then :
+
+		LDFLAGS="$LDFLAGS -L$with_fuse_lib_path"
+		{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Custom FUSE library: $with_fuse_lib_path" >&5
+printf "%s\n" "$as_me: Custom FUSE library: $with_fuse_lib_path" >&6;}
+
+else $as_nop
+
+		{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: Using system-wide fuse library path" >&5
+printf "%s\n" "$as_me: Using system-wide fuse library path" >&6;}
+
+fi
 
 WITH_DIET_LIBC=
 
@@ -12670,22 +12696,23 @@ unsigned short int ascii_mm[] =
 		int use_ebcdic (int i) {
 		  return ebcdic_mm[i] + ebcdic_ii[i];
 		}
-		extern int foo;
-
-int
-main (void)
-{
-return use_ascii (foo) == use_ebcdic (foo);
-  ;
-  return 0;
-}
+		int
+		main (int argc, char **argv)
+		{
+		  /* Intimidate the compiler so that it does not
+		     optimize the arrays away.  */
+		  char *p = argv[0];
+		  ascii_mm[1] = *p++; ebcdic_mm[1] = *p++;
+		  ascii_ii[1] = *p++; ebcdic_ii[1] = *p++;
+		  return use_ascii (argc) == use_ebcdic (*p);
+		}
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
-  if grep BIGenDianSyS conftest.$ac_objext >/dev/null; then
+  if grep BIGenDianSyS conftest$ac_exeext >/dev/null; then
 	      ac_cv_c_bigendian=yes
 	    fi
-	    if grep LiTTleEnDian conftest.$ac_objext >/dev/null ; then
+	    if grep LiTTleEnDian conftest$ac_exeext >/dev/null ; then
 	      if test "$ac_cv_c_bigendian" = unknown; then
 		ac_cv_c_bigendian=no
 	      else
@@ -12694,7 +12721,8 @@ then :
 	      fi
 	    fi
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
 else $as_nop
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */

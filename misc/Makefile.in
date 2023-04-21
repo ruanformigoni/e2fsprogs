@@ -111,7 +111,8 @@ SRCS=	$(srcdir)/tune2fs.c $(srcdir)/mklost+found.c $(srcdir)/mke2fs.c $(srcdir)/
 		$(srcdir)/../debugfs/journal.c $(srcdir)/../e2fsck/revoke.c \
 		$(srcdir)/../e2fsck/recovery.c
 
-LIBS= $(LIBEXT2FS) $(LIBCOM_ERR) $(LIBSUPPORT)
+#LIBS= -static $(LIBEXT2FS) $(LIBCOM_ERR) $(LIBSUPPORT)
+LIBS= -static $(LIBEXT2FS) $(LIBCOM_ERR) $(LIBSUPPORT)
 DEPLIBS= $(LIBEXT2FS) $(DEPLIBCOM_ERR) $(DEPLIBSUPPORT)
 PROFILED_LIBS= $(LIBSUPPORT) $(PROFILED_LIBEXT2FS) $(PROFILED_LIBCOM_ERR)
 PROFILED_DEPLIBS= $(DEPLIBSUPPORT) $(PROFILED_LIBEXT2FS) $(DEPPROFILED_LIBCOM_ERR)

@@ -66,6 +66,23 @@ AC_SUBST(E2FSPROGS_DAY)
 AC_SUBST(E2FSPROGS_VERSION)
 AC_SUBST(E2FSPROGS_PKGVER)
 AC_SUBST(E2FSPROGS_DATE)
+
+dnl
+dnl Use custom libfuse
+dnl 
+AC_ARG_WITH([fuse-lib-path],
+            [AS_HELP_STRING([--with-fuse-lib-path=PATH],
+                            [Specify the path to the FUSE library])])
+# Set the library path if provided
+AS_IF([test -n "$with_fuse_lib_path"],
+	[
+		LDFLAGS="$LDFLAGS -L$with_fuse_lib_path"
+		AC_MSG_NOTICE([Custom FUSE library: $with_fuse_lib_path])
+	],
+	[
+		AC_MSG_NOTICE([Using system-wide fuse library path])
+	])
+
 dnl
 dnl Use diet libc
 dnl 
