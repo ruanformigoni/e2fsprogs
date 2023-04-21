@@ -66,6 +66,14 @@ AC_SUBST(E2FSPROGS_DAY)
 AC_SUBST(E2FSPROGS_VERSION)
 AC_SUBST(E2FSPROGS_PKGVER)
 AC_SUBST(E2FSPROGS_DATE)
+
+dnl
+dnl Use custom libfuse
+dnl 
+AC_ARG_WITH([fuse-lib-path],
+            [AS_HELP_STRING([--with-fuse-lib-path=PATH],
+                            [Specify the path to the FUSE library])])
+
 dnl
 dnl Use diet libc
 dnl 
@@ -1293,6 +1301,16 @@ else
 #endif
 ]], [])], [], [AC_MSG_FAILURE([Cannot find fuse2fs Linux headers.])])
 
+	# Set the library path if provided
+	AS_IF([test -n "$with_fuse_lib_path"],
+		[
+			LDFLAGS="$LDFLAGS -L$with_fuse_lib_path"
+			AC_MSG_NOTICE([Custom FUSE library: $with_fuse_lib_path])
+		],
+		[
+			AC_MSG_NOTICE([Using system-wide fuse library path])
+		])
+
 	AC_CHECK_LIB(osxfuse, fuse_main, [FUSE_LIB=-losxfuse],
 		[AC_CHECK_LIB(fuse, fuse_main, [FUSE_LIB=-lfuse],
 			      [AC_MSG_FAILURE([Cannot find fuse library.])])])
@@ -1309,6 +1327,15 @@ AC_CHECK_HEADERS([pthread.h fuse.h], [], [FUSE_CMT="#"],
 #endif])
 if test -z "$FUSE_CMT"
 then
+	AS_IF([test -n "$with_fuse_lib_path"],
+		[
+			LDFLAGS="$LDFLAGS -L$with_fuse_lib_path"
+			AC_MSG_NOTICE([Custom FUSE library path: $with_fuse_lib_path])
+		],
+		[
+			AC_MSG_NOTICE([Using system-wide fuse library path])
+		])
+
 	AC_CHECK_LIB(osxfuse, fuse_main, [FUSE_LIB=-losxfuse],
 [AC_CHECK_LIB(fuse, fuse_main, [FUSE_LIB=-lfuse], [FUSE_CMT="#"])])
 fi
