@@ -11,21 +11,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Compile and extract the artifact from docker container
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Compile and extract artifacts from docker container
       run: |
         mkdir -p dist
-        docker build -t alpine:e2fsprogs -f Dockerfile.alpine .
-        docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/fuse2fs   /workdir/dist/fuse2fs
-        docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/mke2fs    /workdir/dist/mke2fs
-        docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/e2fsck    /workdir/dist/e2fsck
-        docker run --rm -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/resize2fs /workdir/dist/resize2fs
+
+        for arch in x86_64 aarch64; do
+          docker build --platform "${arch}" -t alpine:e2fsprogs -f Dockerfile.alpine .
+          docker run --rm --platform "${arch}" -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/fuse2fs   "/workdir/dist/fuse2fs-${arch}"
+          docker run --rm --platform "${arch}" -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/mke2fs    "/workdir/dist/mke2fs-${arch}"
+          docker run --rm --platform "${arch}" -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/e2fsck    "/workdir/dist/e2fsck-${arch}"
+          docker run --rm --platform "${arch}" -v $(pwd):/workdir alpine:e2fsprogs cp /e2fsprogs/dist/resize2fs "/workdir/dist/resize2fs-${arch}"
+        done
 
     - name: Set permissions for dist directory
       run: |
         sudo chown -R "$(id -u)":"$(id -g)" dist/
         sudo chmod -R 766 dist/
 
-    - name: Upload artifact to release
+    - name: Upload artifacts to release
       uses: actions/upload-artifact@v1.0.0
       with:
         name: e2fsprogs
