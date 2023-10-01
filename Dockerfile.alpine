@@ -15,7 +15,9 @@ WORKDIR e2fsprogs
 RUN git checkout fuse2fs-offset
 
 # Compile
-RUN mkdir libfuse && wget -Olibfuse/libfuse.a https://github.com/ruanformigoni/libfuse/releases/download/c9db3e5/libfuse.a
+# !! Add this back before merge !!
+# RUN mkdir libfuse && wget -Olibfuse/libfuse.a "https://github.com/ruanformigoni/libfuse/releases/download/c9db3e5/libfuse-$(uname -m).a"
+RUN mkdir libfuse && wget -Olibfuse/libfuse.a "https://github.com/hwittenborn/libfuse/releases/download/cf9319b/libfuse-$(uname -m).a"
 RUN chmod +x ./configure.ac
 RUN autoconf ./configure.ac > configure
 RUN ./configure --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
