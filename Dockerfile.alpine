@@ -22,7 +22,15 @@ RUN ./configure --disable-defrag --with-fuse-lib-path="$(pwd)/libfuse" && make -
 
 # Create static binary
 RUN mkdir -p dist
-RUN upx --brute --no-lzma misc/fuse2fs     -o dist/fuse2fs
-RUN upx --brute --no-lzma misc/mke2fs      -o dist/mke2fs
-RUN upx --brute --no-lzma e2fsck/e2fsck    -o dist/e2fsck
-RUN upx --brute --no-lzma resize/resize2fs -o dist/resize2fs
+
+# Strip
+RUN strip -s -R .comment -R .gnu.version --strip-unneeded misc/fuse2fs
+RUN strip -s -R .comment -R .gnu.version --strip-unneeded misc/mke2fs
+RUN strip -s -R .comment -R .gnu.version --strip-unneeded e2fsck/e2fsck
+RUN strip -s -R .comment -R .gnu.version --strip-unneeded resize/resize2fs
+
+# Compress
+RUN upx --ultra-brute --no-lzma misc/fuse2fs     -o dist/fuse2fs
+RUN upx --ultra-brute --no-lzma misc/mke2fs      -o dist/mke2fs
+RUN upx --ultra-brute --no-lzma e2fsck/e2fsck    -o dist/e2fsck
+RUN upx --ultra-brute --no-lzma resize/resize2fs -o dist/resize2fs
