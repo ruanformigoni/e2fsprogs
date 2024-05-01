@@ -4,7 +4,7 @@ FROM alpine:latest
 # Install deps
 RUN apk update && apk upgrade
 RUN apk add --no-cache git build-base linux-headers libbsd-dev \
-  fuse fuse-dev wget autoconf automake
+  fuse fuse-dev wget autoconf automake upx
 
 # Fetch sources
 ## RUN mkdir e2fsprogs
@@ -15,14 +15,14 @@ WORKDIR e2fsprogs
 RUN git checkout fuse2fs-offset
 
 # Compile
-RUN mkdir libfuse && wget -Olibfuse/libfuse.a "https://github.com/ruanformigoni/libfuse/releases/download/84b8d55/libfuse-$(uname -m).a"
+RUN mkdir -p libfuse && wget -Olibfuse/libfuse.a "https://github.com/ruanformigoni/libfuse/releases/download/84b8d55/libfuse-$(uname -m).a"
 RUN chmod +x ./configure.ac
 RUN autoconf ./configure.ac > configure
 RUN ./configure --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
 
 # Create static binary
 RUN mkdir -p dist
-RUN cp misc/fuse2fs     dist/fuse2fs
-RUN cp misc/mke2fs      dist/mke2fs
-RUN cp e2fsck/e2fsck    dist/e2fsck
-RUN cp resize/resize2fs dist/resize2fs
+RUN upx --brute --no-lzma misc/fuse2fs     -o dist/fuse2fs
+RUN upx --brute --no-lzma misc/mke2fs      -o dist/mke2fs
+RUN upx --brute --no-lzma e2fsck/e2fsck    -o dist/e2fsck
+RUN upx --brute --no-lzma resize/resize2fs -o dist/resize2fs
