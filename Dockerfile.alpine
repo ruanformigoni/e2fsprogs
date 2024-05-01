@@ -18,7 +18,7 @@ RUN git checkout fuse2fs-offset
 RUN mkdir -p libfuse && wget -Olibfuse/libfuse.a "https://github.com/ruanformigoni/libfuse/releases/download/84b8d55/libfuse-$(uname -m).a"
 RUN chmod +x ./configure.ac
 RUN autoconf ./configure.ac > configure
-RUN ./configure --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
+RUN ./configure --disable-defrag --with-fuse-lib-path="$(pwd)/libfuse" && make -j8
 
 # Create static binary
 RUN mkdir -p dist
